@@ -7,6 +7,7 @@ const maxFieldSize uint = 'z' - 'a' + 1
 type Field struct {
 	field [][]cell
 	size  uint
+	isSet bool
 }
 
 type cell struct{}
@@ -21,5 +22,6 @@ func NewField(size uint) Field {
 	return Field{
 		field: f,
 		size:  size,
+		isSet: true,
 	}
 }

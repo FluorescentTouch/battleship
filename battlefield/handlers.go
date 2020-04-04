@@ -31,6 +31,7 @@ func NewHandlers(l *logrus.Logger, e Endpoints) Handlers {
 // @Summary create new battlefield
 // @Success 201
 // @Failure 400 {string} battlefield.HTTPError
+// @Failure 409 {string} battlefield.HTTPError
 // @Failure 500 {string} string
 // @Router /create-matrix [post]
 // @Param model body battlefield.CreateFieldRequest true "size"
@@ -52,6 +53,29 @@ func (h Handlers) CreateBattleField(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.logger.Infof("NEW BATTLEFIELD CREATED WITH SIZE %d", req.Size)
+	handleOKResponse(w, resp)
+}
+
+// ClearBattleField handles request for clearing battlefield
+// @Title ClearBattleField
+// @Tags BattleField
+// @Accept json
+// @Description clear the battlefield
+// @Summary clear the battlefield
+// @Success 200
+// @Failure 500 {string} string
+// @Router /clear [post]
+func (h Handlers) ClearBattleField(w http.ResponseWriter, _ *http.Request) {
+	h.logger.Debug("Handlers: ClearBattleField started")
+
+	resp, err := h.e.clearFieldEndpoint()
+	if err != nil {
+		h.logger.Errorf("Handlers: ClearBattleField: can't clear Field: %v", err)
+		handleErrorResponse(w, err)
+		return
+	}
+
+	h.logger.Info("BATTLEFIELD HAS BEEN CLEARED")
 	handleOKResponse(w, resp)
 }
 

@@ -22,6 +22,7 @@ func TestNewField(t *testing.T) {
 			want: Field{
 				field: [][]cell{},
 				size:  0,
+				isSet: true,
 			},
 		},
 		{
@@ -30,6 +31,7 @@ func TestNewField(t *testing.T) {
 			want: Field{
 				field: [][]cell{{{}, {}}, {{}, {}}},
 				size:  2,
+				isSet: true,
 			},
 		},
 	}
