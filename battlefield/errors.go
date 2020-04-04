@@ -39,7 +39,7 @@ var (
 	}
 
 	errorInvalidFieldSize = HTTPError{
-		Err:  "Field size is invalid",
+		Err:  "field size is invalid",
 		Code: 400,
 	}
 

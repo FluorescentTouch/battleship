@@ -21,7 +21,7 @@ func TestHTTPError_Error(t *testing.T) {
 		{
 			name: "errorInvalidFieldSize",
 			e:    errorInvalidFieldSize,
-			want: "Field size is invalid",
+			want: "field size is invalid",
 		},
 		{
 			name: "errorFieldAlreadySet",
@@ -85,7 +85,7 @@ func TestHTTPError_MarshalJSON(t *testing.T) {
 		{
 			name:    "errorInvalidFieldSize",
 			e:       errorInvalidFieldSize,
-			want:    `{"err":"Field size is invalid"}`,
+			want:    `{"err":"field size is invalid"}`,
 			wantErr: nil,
 		},
 		{

@@ -79,7 +79,7 @@ func TestHandlers_CreateBattleField(t *testing.T) {
 				).Return(errorInvalidFieldSize).Once()
 			},
 			wantStatus: http.StatusBadRequest,
-			wantBody:   `{"err":"Field size is invalid"}`,
+			wantBody:   `{"err":"field size is invalid"}`,
 		},
 		{
 			name: "error, service errorFieldAlreadySet error",
