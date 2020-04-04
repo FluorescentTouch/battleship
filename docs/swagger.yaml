@@ -1,0 +1,48 @@
+basePath: /
+definitions:
+  battlefield.CreateFieldRequest:
+    properties:
+      size:
+        type: integer
+    type: object
+  battlefield.HTTPError:
+    properties:
+      err:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: garatuev@gmail.com
+    name: Shamil Garatuev
+  description: This is a battleships game server.
+  license: {}
+  title: Swagger Example API
+  version: "2.0"
+paths:
+  /create-matrix:
+    post:
+      consumes:
+      - application/json
+      description: create new battlefield with provided size
+      parameters:
+      - description: size
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/battlefield.CreateFieldRequest'
+      responses:
+        "201": {}
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: create new battlefield
+      tags:
+      - BattleField
+swagger: "2.0"

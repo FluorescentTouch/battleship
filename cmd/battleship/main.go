@@ -5,6 +5,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+	"github.com/swaggo/http-swagger"
+
+	_ "my/battleship/docs"
 
 	"my/battleship/battlefield"
 )
@@ -27,6 +30,11 @@ func main() {
 	bh := battlefield.NewHandlers(log, be)
 
 	router := mux.NewRouter()
+
+	// swagger
+	router.PathPrefix("/swagger/").
+		Handler(httpSwagger.Handler(httpSwagger.URL("http://localhost:8080/swagger/doc.json"))).
+		Methods("GET")
 
 	// API
 	router.HandleFunc("/create-matrix", bh.CreateBattleField).Methods("POST")
