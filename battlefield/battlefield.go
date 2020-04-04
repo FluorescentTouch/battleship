@@ -5,12 +5,16 @@ const maxFieldSize uint = 'z' - 'a' + 1
 
 // Field contains all battlefield data.
 type Field struct {
-	field [][]cell
-	size  uint
-	isSet bool
+	field      [][]cell
+	size       uint
+	isSet      bool
+	shipsAdded bool
 }
 
-type cell struct{}
+type cell struct {
+	occupied bool
+	ship     *ship
+}
 
 // NewField creates new battlefield with provided size.
 func NewField(size uint) Field {

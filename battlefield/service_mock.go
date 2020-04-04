@@ -30,3 +30,9 @@ func (r *TestifyServiceMock) clearField() error {
 	results := r.Called()
 	return results.Error(0)
 }
+
+// addShipsByCoordinates is mock implementation.
+func (r *TestifyServiceMock) addShipsByCoordinates(coords string) error {
+	results := r.Called(coords)
+	return results.Error(0)
+}

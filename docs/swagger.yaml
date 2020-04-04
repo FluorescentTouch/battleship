@@ -1,5 +1,10 @@
 basePath: /
 definitions:
+  battlefield.AddShipsRequest:
+    properties:
+      coords:
+        type: string
+    type: object
   battlefield.CreateFieldRequest:
     properties:
       range:
@@ -40,7 +45,7 @@ paths:
       - application/json
       description: create new battlefield with provided size
       parameters:
-      - description: size
+      - description: createParams
         in: body
         name: model
         required: true
@@ -51,11 +56,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/battlefield.HTTPError'
         "409":
           description: Conflict
           schema:
-            type: string
+            $ref: '#/definitions/battlefield.HTTPError'
         "500":
           description: Internal Server Error
           schema:
@@ -63,4 +68,38 @@ paths:
       summary: create new battlefield
       tags:
       - BattleField
+  /ship:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        add ships to battlefield
+        input params should be like this:
+        "A1 B2,C4 C6,E7 F8" where first coordinate is one corner of ship, second - other.
+        ships can be square or rectangular
+        ships can't be placed on top of each other and near each other.
+      parameters:
+      - description: coordinates
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/battlefield.AddShipsRequest'
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/battlefield.HTTPError'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/battlefield.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: add ships to battlefield
+      tags:
+      - Ships
 swagger: "2.0"

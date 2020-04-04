@@ -30,11 +30,11 @@ func NewHandlers(l *logrus.Logger, e Endpoints) Handlers {
 // @Description create new battlefield with provided size
 // @Summary create new battlefield
 // @Success 201
-// @Failure 400 {string} battlefield.HTTPError
-// @Failure 409 {string} battlefield.HTTPError
+// @Failure 400 {object} battlefield.HTTPError
+// @Failure 409 {object} battlefield.HTTPError
 // @Failure 500 {string} string
 // @Router /create-matrix [post]
-// @Param model body battlefield.CreateFieldRequest true "size"
+// @Param model body battlefield.CreateFieldRequest true "createParams"
 func (h Handlers) CreateBattleField(w http.ResponseWriter, r *http.Request) {
 	h.logger.Debug("Handlers: CreateBattleField started")
 
@@ -42,7 +42,7 @@ func (h Handlers) CreateBattleField(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		h.logger.Errorf("Handlers: CreateBattleField: can't decode request: %v", err)
-		handleErrorResponse(w, errorInvalidCreateFieldParams)
+		handleErrorResponse(w, errorInvalidInputParams)
 		return
 	}
 	resp, err := h.e.createFieldEndpoint(req)
@@ -76,6 +76,43 @@ func (h Handlers) ClearBattleField(w http.ResponseWriter, _ *http.Request) {
 	}
 
 	h.logger.Info("BATTLEFIELD HAS BEEN CLEARED")
+	handleOKResponse(w, resp)
+}
+
+// AddShips handles request for adding ships to battlefield
+// @Title AddShips
+// @Tags Ships
+// @Accept json
+// @Description add ships to battlefield
+// @Description input params should be like this:
+// @Description "A1 B2,C4 C6,E7 F8" where first coordinate is one corner of ship, second - other.
+// @Description ships can be square or rectangular
+// @Description ships can't be placed on top of each other and near each other.
+// @Summary add ships to battlefield
+// @Success 200
+// @Failure 400 {object} battlefield.HTTPError
+// @Failure 409 {object} battlefield.HTTPError
+// @Failure 500 {string} string
+// @Router /ship [post]
+// @Param model body battlefield.AddShipsRequest true "coordinates"
+func (h Handlers) AddShips(w http.ResponseWriter, r *http.Request) {
+	h.logger.Debug("Handlers: AddShips started")
+
+	req := AddShipsRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		h.logger.Errorf("Handlers: AddShips: can't decode request: %v", err)
+		handleErrorResponse(w, errorInvalidInputParams)
+		return
+	}
+	resp, err := h.e.addShipsEndpoint(req)
+	if err != nil {
+		h.logger.Errorf("Handlers: AddShips: can't add ships: %v", err)
+		handleErrorResponse(w, err)
+		return
+	}
+
+	h.logger.Infof("SHIPS ADDED")
 	handleOKResponse(w, resp)
 }
 

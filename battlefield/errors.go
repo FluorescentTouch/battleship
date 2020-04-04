@@ -33,7 +33,7 @@ func (e HTTPError) MarshalJSON() ([]byte, error) {
 }
 
 var (
-	errorInvalidCreateFieldParams = HTTPError{
+	errorInvalidInputParams = HTTPError{
 		Err:  "invalid input params",
 		Code: 400,
 	}
@@ -46,5 +46,30 @@ var (
 	errorFieldAlreadySet = HTTPError{
 		Err:  "field is already set",
 		Code: 409,
+	}
+
+	errorInvalidCoordinate = HTTPError{
+		Err:  "invalid coordinate provided",
+		Code: 400,
+	}
+
+	errorCellIsOccupiedByShip = HTTPError{
+		Err:  "can't place ships on top of each other",
+		Code: 400,
+	}
+
+	errorCellIsOccupiedNearby = HTTPError{
+		Err:  "can't place ships close to each other",
+		Code: 400,
+	}
+
+	errorShipsAlreadyAdded = HTTPError{
+		Err:  "ships are already added",
+		Code: 400,
+	}
+
+	errorOutOfBonds = HTTPError{
+		Err:  "out of bonds",
+		Code: 400,
 	}
 )

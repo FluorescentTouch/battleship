@@ -46,7 +46,7 @@
                 "summary": "create new battlefield",
                 "parameters": [
                     {
-                        "description": "size",
+                        "description": "createParams",
                         "name": "model",
                         "in": "body",
                         "required": true,
@@ -60,13 +60,57 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/battlefield.HTTPError"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
+                            "$ref": "#/definitions/battlefield.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ship": {
+            "post": {
+                "description": "add ships to battlefield\ninput params should be like this:\n\"A1 B2,C4 C6,E7 F8\" where first coordinate is one corner of ship, second - other.\nships can be square or rectangular\nships can't be placed on top of each other and near each other.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ships"
+                ],
+                "summary": "add ships to battlefield",
+                "parameters": [
+                    {
+                        "description": "coordinates",
+                        "name": "model",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/battlefield.AddShipsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {},
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/battlefield.HTTPError"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/battlefield.HTTPError"
                         }
                     },
                     "500": {
@@ -80,6 +124,14 @@
         }
     },
     "definitions": {
+        "battlefield.AddShipsRequest": {
+            "type": "object",
+            "properties": {
+                "coords": {
+                    "type": "string"
+                }
+            }
+        },
         "battlefield.CreateFieldRequest": {
             "type": "object",
             "properties": {
