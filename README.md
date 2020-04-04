@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/FluorescentTouch/battleship.svg?branch=master)](https://travis-ci.com/FluorescentTouch/battleship)
+[![Coverage Status](https://coveralls.io/repos/github/FluorescentTouch/battleship/badge.svg?branch=master)](https://coveralls.io/github/FluorescentTouch/battleship?branch=master)
+
 # battleship
 
 Battleship is simple application, that emulates this game.
