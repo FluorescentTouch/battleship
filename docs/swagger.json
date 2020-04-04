@@ -1,0 +1,73 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a battleships game server.",
+        "title": "Swagger Example API",
+        "contact": {
+            "name": "Shamil Garatuev",
+            "email": "garatuev@gmail.com"
+        },
+        "license": {},
+        "version": "2.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/create-matrix": {
+            "post": {
+                "description": "create new battlefield with provided size",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BattleField"
+                ],
+                "summary": "create new battlefield",
+                "parameters": [
+                    {
+                        "description": "size",
+                        "name": "model",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/battlefield.CreateFieldRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {},
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "battlefield.CreateFieldRequest": {
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "integer"
+                }
+            }
+        },
+        "battlefield.HTTPError": {
+            "type": "object",
+            "properties": {
+                "err": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
