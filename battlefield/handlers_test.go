@@ -43,7 +43,7 @@ func TestHandlers_CreateBattleField(t *testing.T) {
 			args: args{
 				url:    "/create-matrix",
 				method: http.MethodPost,
-				body:   fmt.Sprintf(`{"size": %d}`, maxFieldSize-1),
+				body:   fmt.Sprintf(`{"range": %d}`, maxFieldSize-1),
 			},
 			setup: func() {
 				testifyServiceMock.On(
@@ -70,7 +70,7 @@ func TestHandlers_CreateBattleField(t *testing.T) {
 			args: args{
 				url:    "/create-matrix",
 				method: http.MethodPost,
-				body:   fmt.Sprintf(`{"size": %d}`, maxFieldSize+1),
+				body:   fmt.Sprintf(`{"range": %d}`, maxFieldSize+1),
 			},
 			setup: func() {
 				testifyServiceMock.On(
@@ -86,7 +86,7 @@ func TestHandlers_CreateBattleField(t *testing.T) {
 			args: args{
 				url:    "/create-matrix",
 				method: http.MethodPost,
-				body:   fmt.Sprintf(`{"size": %d}`, maxFieldSize+1),
+				body:   fmt.Sprintf(`{"range": %d}`, maxFieldSize+1),
 			},
 			setup: func() {
 				testifyServiceMock.On(

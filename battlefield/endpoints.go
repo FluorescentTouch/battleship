@@ -23,7 +23,7 @@ type Endpoints struct {
 
 // CreateFieldRequest collect params for createField request.
 type CreateFieldRequest struct {
-	Size uint `json:"size"`
+	Size uint `json:"range"`
 }
 
 // CreateFieldResponse created for swagger docs.

@@ -56,7 +56,7 @@
         "battlefield.CreateFieldRequest": {
             "type": "object",
             "properties": {
-                "size": {
+                "range": {
                     "type": "integer"
                 }
             }
