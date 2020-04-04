@@ -19,8 +19,14 @@ func NewTestifyServiceMock(t *testing.T) *TestifyServiceMock {
 	return m
 }
 
-// ReleaseVersionList is mock implementation.
+// createField is mock implementation.
 func (r *TestifyServiceMock) createField(size uint) error {
 	results := r.Called(size)
+	return results.Error(0)
+}
+
+// clearField is mock implementation.
+func (r *TestifyServiceMock) clearField() error {
+	results := r.Called()
 	return results.Error(0)
 }

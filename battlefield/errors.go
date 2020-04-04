@@ -42,4 +42,9 @@ var (
 		Err:  "Field size is invalid",
 		Code: 400,
 	}
+
+	errorFieldAlreadySet = HTTPError{
+		Err:  "field is already set",
+		Code: 409,
+	}
 )

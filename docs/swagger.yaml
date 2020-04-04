@@ -20,6 +20,20 @@ info:
   title: Swagger Example API
   version: "2.0"
 paths:
+  /clear:
+    post:
+      consumes:
+      - application/json
+      description: clear the battlefield
+      responses:
+        "200": {}
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: clear the battlefield
+      tags:
+      - BattleField
   /create-matrix:
     post:
       consumes:
@@ -36,6 +50,10 @@ paths:
         "201": {}
         "400":
           description: Bad Request
+          schema:
+            type: string
+        "409":
+          description: Conflict
           schema:
             type: string
         "500":

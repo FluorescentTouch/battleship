@@ -8,6 +8,7 @@ import (
 
 type service interface {
 	createField(size uint) error
+	clearField() error
 }
 
 // NewEndpoints creates new Endpoints.
@@ -39,4 +40,19 @@ func (e Endpoints) createFieldEndpoint(r CreateFieldRequest) (CreateFieldRespons
 
 	err := e.service.createField(r.Size)
 	return CreateFieldResponse{}, err
+}
+
+// ClearFieldResponse defined for swagger docs.
+type ClearFieldResponse struct{}
+
+// StatusCode implements StatusCoder.
+func (r ClearFieldResponse) StatusCode() int {
+	return http.StatusOK
+}
+
+func (e Endpoints) clearFieldEndpoint() (ClearFieldResponse, error) {
+	e.logger.Debug("Endpoints: clearFieldEndpoint started")
+
+	err := e.service.clearField()
+	return ClearFieldResponse{}, err
 }

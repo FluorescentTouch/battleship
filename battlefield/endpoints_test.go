@@ -23,12 +23,6 @@ func TestCreateFieldResponse_StatusCode(t *testing.T) {
 }
 
 func TestCreateFieldEndpoint(t *testing.T) {
-	l := logrus.New()
-	e := Endpoints{
-		logger:  l,
-		service: &Service{logger: l},
-	}
-
 	type args struct {
 		req CreateFieldRequest
 	}
@@ -60,8 +54,60 @@ func TestCreateFieldEndpoint(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		l := logrus.New()
+		e := Endpoints{
+			logger:  l,
+			service: &Service{logger: l},
+		}
+
 		t.Run(tt.name, func(t *testing.T) {
 			resp, err := e.createFieldEndpoint(tt.args.req)
+			assert.Equal(t, tt.wantErr, err)
+			assert.Equal(t, tt.want, resp)
+		})
+	}
+}
+
+func TestClearFieldResponse_StatusCode(t *testing.T) {
+	want := http.StatusOK
+	got := ClearFieldResponse{}.StatusCode()
+	assert.Equal(t, want, got)
+}
+
+func TestClearFieldEndpoint(t *testing.T) {
+	type args struct {
+		f Field
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    ClearFieldResponse
+		wantErr error
+	}{
+		{
+			name:    "success, field is set",
+			args:    args{f: Field{isSet: true}},
+			want:    ClearFieldResponse{},
+			wantErr: nil,
+		},
+		{
+			name:    "success, field is not set",
+			args:    args{},
+			want:    ClearFieldResponse{},
+			wantErr: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		l := logrus.New()
+		e := Endpoints{
+			logger:  l,
+			service: &Service{logger: l},
+		}
+
+		t.Run(tt.name, func(t *testing.T) {
+			resp, err := e.clearFieldEndpoint()
 			assert.Equal(t, tt.wantErr, err)
 			assert.Equal(t, tt.want, resp)
 		})

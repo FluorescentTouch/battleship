@@ -23,6 +23,11 @@ func TestHTTPError_Error(t *testing.T) {
 			e:    errorInvalidFieldSize,
 			want: "Field size is invalid",
 		},
+		{
+			name: "errorFieldAlreadySet",
+			e:    errorFieldAlreadySet,
+			want: "field is already set",
+		},
 	}
 
 	for _, tt := range tests {
@@ -48,6 +53,11 @@ func TestHTTPError_StatusCode(t *testing.T) {
 			name: "errorInvalidFieldSize",
 			e:    errorInvalidFieldSize,
 			want: http.StatusBadRequest,
+		},
+		{
+			name: "errorFieldAlreadySet",
+			e:    errorFieldAlreadySet,
+			want: http.StatusConflict,
 		},
 	}
 
@@ -76,6 +86,12 @@ func TestHTTPError_MarshalJSON(t *testing.T) {
 			name:    "errorInvalidFieldSize",
 			e:       errorInvalidFieldSize,
 			want:    `{"err":"Field size is invalid"}`,
+			wantErr: nil,
+		},
+		{
+			name:    "errorFieldAlreadySet",
+			e:       errorFieldAlreadySet,
+			want:    `{"err":"field is already set"}`,
 			wantErr: nil,
 		},
 	}

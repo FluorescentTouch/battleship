@@ -24,6 +24,10 @@ func (s *Service) createField(size uint) error {
 	s.Lock()
 	defer s.Unlock()
 
+	if s.f.isSet {
+		return errorFieldAlreadySet
+	}
+
 	s.logger.WithField("size", size).Debug("Service: createField started")
 
 	if size < 1 || size > maxFieldSize {
@@ -32,5 +36,15 @@ func (s *Service) createField(size uint) error {
 		return errorInvalidFieldSize
 	}
 	s.f = NewField(size)
+	return nil
+}
+
+func (s *Service) clearField() error {
+	s.Lock()
+	defer s.Unlock()
+
+	s.logger.Debug("Service: clearField started")
+
+	s.f = Field{}
 	return nil
 }
