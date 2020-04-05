@@ -61,7 +61,7 @@ func (e Endpoints) clearFieldEndpoint() (ClearFieldResponse, error) {
 
 // AddShipsRequest collect params for addShips request.
 type AddShipsRequest struct {
-	Coords string `json:"coords"`
+	Coords string `json:"Coordinates"`
 }
 
 // AddShipsResponse created for swagger docs.

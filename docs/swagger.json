@@ -165,7 +165,7 @@
         "battlefield.AddShipsRequest": {
             "type": "object",
             "properties": {
-                "coords": {
+                "Coordinates": {
                     "type": "string"
                 }
             }

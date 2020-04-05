@@ -235,7 +235,7 @@ func TestHandlers_AddShips(t *testing.T) {
 			args: args{
 				url:    "/ship",
 				method: http.MethodPost,
-				body:   `{"coords": "A1 A1"}`,
+				body:   `{"Coordinates": "A1 A1"}`,
 			},
 			setup: func() {
 				testifyServiceMock.On(
@@ -262,7 +262,7 @@ func TestHandlers_AddShips(t *testing.T) {
 			args: args{
 				url:    "/ship",
 				method: http.MethodPost,
-				body:   `{"coords": "A1 A1"}`,
+				body:   `{"Coordinates": "A1 A1"}`,
 			},
 			setup: func() {
 				testifyServiceMock.On(
@@ -278,7 +278,7 @@ func TestHandlers_AddShips(t *testing.T) {
 			args: args{
 				url:    "/ship",
 				method: http.MethodPost,
-				body:   `{"coords": "A1 A1"}`,
+				body:   `{"Coordinates": "A1 A1"}`,
 			},
 			setup: func() {
 				testifyServiceMock.On(
