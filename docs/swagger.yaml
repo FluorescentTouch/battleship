@@ -15,6 +15,11 @@ definitions:
       err:
         type: string
     type: object
+  battlefield.ShotRequest:
+    properties:
+      coord:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -102,4 +107,31 @@ paths:
       summary: add ships to battlefield
       tags:
       - Ships
+  /shot:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        make a shot to provided coordinate
+        example: "A1"
+      parameters:
+      - description: shot coordinates
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/battlefield.ShotRequest'
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/battlefield.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: make a shot to provided coordinate
+      tags:
+      - BattleField
 swagger: "2.0"

@@ -72,4 +72,14 @@ var (
 		Err:  "out of bonds",
 		Code: 400,
 	}
+
+	errorCellAlreadyShot = HTTPError{
+		Err:  "cell was already shot",
+		Code: 400,
+	}
+
+	errorShipsNotPlaced = HTTPError{
+		Err:  "ships not placed yet",
+		Code: 400,
+	}
 )

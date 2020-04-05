@@ -1,11 +1,12 @@
 package battlefield
 
 import (
-	"my/battleship/coordinates"
 	"testing"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"my/battleship/coordinates"
 )
 
 func TestNewService(t *testing.T) {
@@ -115,10 +116,12 @@ func TestPlaceShip(t *testing.T) {
 			name: "success, occupy all field",
 			args: args{
 				field: Field{
-					field: [][]cell{{{}, {}}, {{}, {}}},
+					field: [][]cell{{{}}},
 					size:  2,
 				},
-				ship: &ship{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}}},
+				ship: &ship{
+					inner: coordinates.Coordinates{{X: 0, Y: 0}: {}},
+				},
 			},
 			wantErr: nil,
 		},
@@ -129,7 +132,9 @@ func TestPlaceShip(t *testing.T) {
 					field: [][]cell{{{}, {}}, {{}, {}}},
 					size:  2,
 				},
-				ship: &ship{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 0}}},
+				ship: &ship{
+					inner: coordinates.Coordinates{{X: 0, Y: 0}: {}},
+				},
 			},
 			wantErr: nil,
 		},
@@ -140,7 +145,9 @@ func TestPlaceShip(t *testing.T) {
 					field: [][]cell{{{}, {occupied: true}}, {{occupied: true}, {occupied: true}}},
 					size:  2,
 				},
-				ship: &ship{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 0}}},
+				ship: &ship{
+					inner: coordinates.Coordinates{{X: 0, Y: 0}: {}},
+				},
 			},
 			wantErr: nil,
 		},
@@ -151,7 +158,9 @@ func TestPlaceShip(t *testing.T) {
 					field: [][]cell{{{}}},
 					size:  1,
 				},
-				ship: &ship{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}}},
+				ship: &ship{
+					inner: coordinates.Coordinates{{X: 0, Y: 0}: {}, {X: 1, Y: 0}: {}, {X: 0, Y: 1}: {}, {X: 1, Y: 1}: {}},
+				},
 			},
 			wantErr: errorOutOfBonds,
 		},
@@ -165,7 +174,9 @@ func TestPlaceShip(t *testing.T) {
 					}}},
 					size: 1,
 				},
-				ship: &ship{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 0}}},
+				ship: &ship{
+					inner: coordinates.Coordinates{{X: 0, Y: 0}: {}},
+				},
 			},
 			wantErr: errorCellIsOccupiedByShip,
 		},
@@ -178,7 +189,9 @@ func TestPlaceShip(t *testing.T) {
 					}}},
 					size: 1,
 				},
-				ship: &ship{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 0}}},
+				ship: &ship{
+					inner: coordinates.Coordinates{{X: 0, Y: 0}: {}},
+				},
 			},
 			wantErr: errorCellIsOccupiedNearby,
 		},
@@ -211,20 +224,33 @@ func TestAddShips(t *testing.T) {
 					field: [][]cell{{{}, {}}, {{}, {}}},
 					size:  2,
 				},
-				ships: []*ship{{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}}}},
+				ships: []*ship{
+					{
+						inner: coordinates.Coordinates{
+							{X: 0, Y: 0}: {},
+							{X: 1, Y: 1}: {},
+							{X: 1, Y: 0}: {},
+							{X: 0, Y: 1}: {},
+						},
+					},
+				},
 			},
 			wantErr: nil,
 		},
 		{
-			name: "success, tow non-overlapping ship added",
+			name: "success, two non-overlapping ship added",
 			args: args{
 				field: Field{
 					field: [][]cell{{{}, {}, {}}, {{}, {}, {}}, {{}, {}, {}}},
 					size:  3,
 				},
 				ships: []*ship{
-					{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 2, Y: 0}}},
-					{c: [2]coordinates.Coordinate{{X: 2, Y: 2}, {X: 2, Y: 2}}},
+					{
+						inner: coordinates.Coordinates{{X: 0, Y: 0}: {}, {X: 1, Y: 0}: {}, {X: 2, Y: 0}: {}},
+					},
+					{
+						inner: coordinates.Coordinates{{X: 2, Y: 2}: {}},
+					},
 				},
 			},
 			wantErr: nil,
@@ -237,8 +263,12 @@ func TestAddShips(t *testing.T) {
 					size:  2,
 				},
 				ships: []*ship{
-					{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 0}}},
-					{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 1}}},
+					{
+						inner: coordinates.Coordinates{{X: 0, Y: 0}: {}, {X: 1, Y: 0}: {}},
+					},
+					{
+						inner: coordinates.Coordinates{{X: 0, Y: 0}: {}, {X: 0, Y: 1}: {}},
+					},
 				},
 			},
 			wantErr: errorCellIsOccupiedByShip,
@@ -251,8 +281,17 @@ func TestAddShips(t *testing.T) {
 					size:  2,
 				},
 				ships: []*ship{
-					{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 0}}},
-					{c: [2]coordinates.Coordinate{{X: 1, Y: 1}, {X: 1, Y: 1}}},
+					{
+						inner: coordinates.Coordinates{{X: 0, Y: 0}: {}},
+						outer: coordinates.Coordinates{
+							{X: 1, Y: 0}: {},
+							{X: 0, Y: 1}: {},
+							{X: 1, Y: 1}: {},
+						},
+					},
+					{
+						inner: coordinates.Coordinates{{X: 1, Y: 1}: {}, {X: 1, Y: 1}: {}},
+					},
 				},
 			},
 			wantErr: errorCellIsOccupiedNearby,
@@ -264,7 +303,9 @@ func TestAddShips(t *testing.T) {
 					size: 1,
 				},
 				ships: []*ship{
-					{c: [2]coordinates.Coordinate{{X: 2, Y: 2}, {X: 2, Y: 2}}},
+					{
+						inner: coordinates.Coordinates{{X: 2, Y: 2}: {}, {X: 2, Y: 2}: {}},
+					},
 				},
 			},
 			wantErr: errorOutOfBonds,
@@ -370,6 +411,154 @@ func TestAddShipsByCoordinates(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			err := s.addShipsByCoordinates(tt.args.coords)
+			assert.Equal(t, tt.wantErr, err)
+		})
+	}
+}
+
+func TestShot(t *testing.T) {
+	type args struct {
+		coordinate string
+		field      Field
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    shotResult
+		wantErr error
+	}{
+		{
+			name: "success",
+			args: args{
+				field: Field{
+					field:      [][]cell{{{ship: &ship{aliveCells: 2}}, {}}, {{}, {}}},
+					shipsAlive: 2,
+					size:       2,
+					shipsAdded: true,
+				},
+				coordinate: "A1",
+			},
+			want: shotResult{
+				Destroy: false,
+				Knock:   true,
+				End:     false,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "success, kill not-last ship",
+			args: args{
+				field: Field{
+					field:      [][]cell{{{ship: &ship{aliveCells: 1}}, {}}, {{}, {}}},
+					shipsAlive: 2,
+					size:       2,
+					shipsAdded: true,
+				},
+				coordinate: "A1",
+			},
+			want: shotResult{
+				Destroy: true,
+				Knock:   true,
+				End:     false,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "success, kill last ship",
+			args: args{
+				field: Field{
+					field:      [][]cell{{{ship: &ship{aliveCells: 1}}, {}}, {{}, {}}},
+					shipsAlive: 1,
+					size:       2,
+					shipsAdded: true,
+				},
+				coordinate: "A1",
+			},
+			want: shotResult{
+				Destroy: true,
+				Knock:   true,
+				End:     true,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "success, miss",
+			args: args{
+				field: Field{
+					field:      [][]cell{{{ship: &ship{aliveCells: 1}}, {}}, {{}, {}}},
+					shipsAlive: 1,
+					size:       2,
+					shipsAdded: true,
+				},
+				coordinate: "A2",
+			},
+			want: shotResult{
+				Destroy: false,
+				Knock:   false,
+				End:     false,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "error, shot on already shot cell",
+			args: args{
+				field: Field{
+					field:      [][]cell{{{shot: true}, {}}, {{}, {}}},
+					size:       2,
+					shipsAdded: true,
+				},
+				coordinate: "A1",
+			},
+			want:    shotResult{},
+			wantErr: errorCellAlreadyShot,
+		},
+		{
+			name: "error, shot out of bonds",
+			args: args{
+				field: Field{
+					field:      [][]cell{{{}, {}}, {{}, {}}},
+					size:       2,
+					shipsAdded: true,
+				},
+				coordinate: "C5",
+			},
+			want:    shotResult{},
+			wantErr: errorOutOfBonds,
+		},
+		{
+			name: "error, invalid coordinate",
+			args: args{
+				field: Field{
+					field:      [][]cell{{{}, {}}, {{}, {}}},
+					size:       2,
+					shipsAdded: true,
+				},
+				coordinate: "invalid coordinate",
+			},
+			want:    shotResult{},
+			wantErr: errorInvalidCoordinate,
+		},
+		{
+			name: "error, ships not added",
+			args: args{
+				field: Field{
+					field:      [][]cell{{{}, {}}, {{}, {}}},
+					size:       2,
+					shipsAdded: false,
+				},
+				coordinate: "A1",
+			},
+			want:    shotResult{},
+			wantErr: errorShipsNotPlaced,
+		},
+	}
+
+	for _, tt := range tests {
+		s := Service{logger: logrus.New(), f: tt.args.field}
+
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := s.shot(tt.args.coordinate)
+			assert.Equal(t, tt.want, got)
 			assert.Equal(t, tt.wantErr, err)
 		})
 	}

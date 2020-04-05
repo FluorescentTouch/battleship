@@ -7,12 +7,21 @@ import (
 )
 
 type ship struct {
-	c [2]coordinates.Coordinate
+	c          [2]coordinates.Coordinate
+	inner      coordinates.Coordinates
+	outer      coordinates.Coordinates
+	aliveCells int
 }
 
 func newShip(p1, p2 coordinates.Coordinate) *ship {
+	c := [2]coordinates.Coordinate{p1, p2}
+	in, out := coordinates.GetInnerOuterCells(c)
+
 	return &ship{
-		c: [2]coordinates.Coordinate{p1, p2},
+		c:          c,
+		inner:      in,
+		outer:      out,
+		aliveCells: len(in),
 	}
 }
 

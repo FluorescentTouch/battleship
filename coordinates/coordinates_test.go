@@ -66,59 +66,39 @@ func TestGetInnerOuterCells(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      [2]Coordinate
-		wantInner []Coordinate
-		wantOuter []Coordinate
+		wantInner map[Coordinate]struct{}
+		wantOuter map[Coordinate]struct{}
 	}{
 		{
 			name:      "not zero",
 			args:      [2]Coordinate{{1, 1}, {1, 1}},
-			wantInner: []Coordinate{{1, 1}},
-			wantOuter: []Coordinate{{0, 0}, {0, 1}, {0, 2}, {1, 2}, {2, 2}, {2, 1}, {2, 0}, {1, 0}},
+			wantInner: map[Coordinate]struct{}{{1, 1}: {}},
+			wantOuter: map[Coordinate]struct{}{{0, 0}: {}, {0, 1}: {}, {0, 2}: {}, {1, 2}: {}, {2, 2}: {}, {2, 1}: {}, {2, 0}: {}, {1, 0}: {}},
 		},
 		{
 			name:      "x is zero",
 			args:      [2]Coordinate{{0, 1}, {0, 1}},
-			wantInner: []Coordinate{{0, 1}},
-			wantOuter: []Coordinate{{0, 0}, {1, 0}, {1, 1}, {1, 2}, {0, 2}},
+			wantInner: map[Coordinate]struct{}{{0, 1}: {}},
+			wantOuter: map[Coordinate]struct{}{{0, 0}: {}, {1, 0}: {}, {1, 1}: {}, {1, 2}: {}, {0, 2}: {}},
 		},
 		{
 			name:      "y is zero",
 			args:      [2]Coordinate{{1, 0}, {1, 0}},
-			wantInner: []Coordinate{{1, 0}},
-			wantOuter: []Coordinate{{0, 0}, {0, 1}, {1, 1}, {2, 1}, {2, 0}},
+			wantInner: map[Coordinate]struct{}{{1, 0}: {}},
+			wantOuter: map[Coordinate]struct{}{{0, 0}: {}, {0, 1}: {}, {1, 1}: {}, {2, 1}: {}, {2, 0}: {}},
 		},
 		{
 			name:      "both coordinates are zero",
 			args:      [2]Coordinate{{0, 0}, {0, 0}},
-			wantInner: []Coordinate{{0, 0}},
-			wantOuter: []Coordinate{{0, 1}, {1, 1}, {1, 0}},
+			wantInner: map[Coordinate]struct{}{{0, 0}: {}},
+			wantOuter: map[Coordinate]struct{}{{0, 1}: {}, {1, 1}: {}, {1, 0}: {}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			in, out := GetInnerOuterCells(tt.args)
-
-			// because for assert.Equal the order of slice is important
-			// compare maps of resulted values.
-			mWantInner := make(map[Coordinate]struct{}, len(tt.wantInner))
-			for _, c := range tt.wantInner {
-				mWantInner[c] = struct{}{}
-			}
-			mGotInner := make(map[Coordinate]struct{}, len(in))
-			for _, c := range in {
-				mGotInner[c] = struct{}{}
-			}
-			assert.Equal(t, mWantInner, mGotInner)
-
-			mWantOuter := make(map[Coordinate]struct{}, len(tt.wantOuter))
-			for _, c := range tt.wantOuter {
-				mWantOuter[c] = struct{}{}
-			}
-			mGotOuter := make(map[Coordinate]struct{}, len(out))
-			for _, c := range out {
-				mGotOuter[c] = struct{}{}
-			}
-			assert.Equal(t, mWantOuter, mGotOuter)
+			assert.Equal(t, tt.wantInner, in)
+			assert.Equal(t, tt.wantOuter, out)
 		})
 	}
 }
@@ -131,7 +111,7 @@ func TestOuterCells(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []Coordinate
+		want map[Coordinate]struct{}
 	}{
 		{
 			name: "not zero",
@@ -141,7 +121,7 @@ func TestOuterCells(t *testing.T) {
 				ly: 1,
 				by: 1,
 			},
-			want: []Coordinate{{0, 0}, {0, 1}, {0, 2}, {1, 2}, {2, 2}, {2, 1}, {2, 0}, {1, 0}},
+			want: map[Coordinate]struct{}{{0, 0}: {}, {0, 1}: {}, {0, 2}: {}, {1, 2}: {}, {2, 2}: {}, {2, 1}: {}, {2, 0}: {}, {1, 0}: {}},
 		},
 		{
 			name: "x is zero",
@@ -151,7 +131,7 @@ func TestOuterCells(t *testing.T) {
 				ly: 1,
 				by: 1,
 			},
-			want: []Coordinate{{0, 0}, {1, 0}, {1, 1}, {1, 2}, {0, 2}},
+			want: map[Coordinate]struct{}{{0, 0}: {}, {1, 0}: {}, {1, 1}: {}, {1, 2}: {}, {0, 2}: {}},
 		},
 		{
 			name: "y is zero",
@@ -161,7 +141,7 @@ func TestOuterCells(t *testing.T) {
 				ly: 0,
 				by: 0,
 			},
-			want: []Coordinate{{0, 0}, {0, 1}, {1, 1}, {2, 1}, {2, 0}},
+			want: map[Coordinate]struct{}{{0, 0}: {}, {0, 1}: {}, {1, 1}: {}, {2, 1}: {}, {2, 0}: {}},
 		},
 		{
 			name: "both coordinates are zero",
@@ -171,7 +151,7 @@ func TestOuterCells(t *testing.T) {
 				ly: 0,
 				by: 0,
 			},
-			want: []Coordinate{{0, 1}, {1, 1}, {1, 0}},
+			want: map[Coordinate]struct{}{{0, 1}: {}, {1, 1}: {}, {1, 0}: {}},
 		},
 	}
 	for _, tt := range tests {
@@ -182,19 +162,8 @@ func TestOuterCells(t *testing.T) {
 				tt.args.ly,
 				tt.args.by,
 			)
-			// because for assert.Equal the order of slice is important
-			// compare maps of resulted values.
-			mWant := make(map[Coordinate]struct{}, len(tt.want))
-			for _, c := range tt.want {
-				mWant[c] = struct{}{}
-			}
 
-			mGot := make(map[Coordinate]struct{}, len(got))
-			for _, c := range got {
-				mGot[c] = struct{}{}
-			}
-
-			assert.Equal(t, mWant, mGot)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -207,7 +176,7 @@ func TestInnerCells(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []Coordinate
+		want map[Coordinate]struct{}
 	}{
 		{
 			name: "single cell",
@@ -217,7 +186,7 @@ func TestInnerCells(t *testing.T) {
 				ly: 1,
 				by: 1,
 			},
-			want: []Coordinate{{1, 1}},
+			want: map[Coordinate]struct{}{{1, 1}: {}},
 		},
 		{
 			name: "multiple cells, left to right",
@@ -227,7 +196,7 @@ func TestInnerCells(t *testing.T) {
 				ly: 1,
 				by: 1,
 			},
-			want: []Coordinate{{1, 1}, {2, 1}, {3, 1}},
+			want: map[Coordinate]struct{}{{1, 1}: {}, {2, 1}: {}, {3, 1}: {}},
 		},
 		{
 			name: "multiple cells, up to bottom",
@@ -237,7 +206,7 @@ func TestInnerCells(t *testing.T) {
 				ly: 1,
 				by: 3,
 			},
-			want: []Coordinate{{1, 1}, {1, 2}, {1, 3}},
+			want: map[Coordinate]struct{}{{1, 1}: {}, {1, 2}: {}, {1, 3}: {}},
 		},
 		{
 			name: "multiple cells, diagonal",
@@ -247,7 +216,7 @@ func TestInnerCells(t *testing.T) {
 				ly: 1,
 				by: 2,
 			},
-			want: []Coordinate{{1, 1}, {1, 2}, {2, 1}, {2, 2}},
+			want: map[Coordinate]struct{}{{1, 1}: {}, {1, 2}: {}, {2, 1}: {}, {2, 2}: {}},
 		},
 	}
 	for _, tt := range tests {

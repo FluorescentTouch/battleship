@@ -173,3 +173,69 @@ func TestAddShipsEndpoint(t *testing.T) {
 		})
 	}
 }
+
+func TestShotsResponse_StatusCode(t *testing.T) {
+	want := http.StatusOK
+	got := ShotResponse{}.StatusCode()
+	assert.Equal(t, want, got)
+}
+
+func TestShotEndpoint(t *testing.T) {
+	type args struct {
+		field Field
+		req   ShotRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    ShotResponse
+		wantErr error
+	}{
+		{
+			name: "success",
+			args: args{
+				field: Field{
+					field:      [][]cell{{{ship: &ship{aliveCells: 1}}}},
+					size:       1,
+					shipsAlive: 1,
+					shipsAdded: true,
+				},
+				req: ShotRequest{Coord: "A1"},
+			},
+			want: ShotResponse{
+				Knock:   true,
+				Destroy: true,
+				End:     true,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "error",
+			args: args{
+				field: Field{
+					shipsAdded: false,
+				},
+				req: ShotRequest{Coord: "A1"},
+			},
+			want:    ShotResponse{},
+			wantErr: errorShipsNotPlaced,
+		},
+	}
+
+	for _, tt := range tests {
+		l := logrus.New()
+		e := Endpoints{
+			logger: l,
+			service: &Service{
+				f:      tt.args.field,
+				logger: l,
+			},
+		}
+
+		t.Run(tt.name, func(t *testing.T) {
+			resp, err := e.shotEndpoint(tt.args.req)
+			assert.Equal(t, tt.wantErr, err)
+			assert.Equal(t, tt.want, resp)
+		})
+	}
+}
