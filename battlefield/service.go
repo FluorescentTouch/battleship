@@ -76,6 +76,7 @@ func (s *Service) addShipsByCoordinates(coords string) error {
 	}
 	s.f.shipsAdded = true
 	s.f.shipsAlive = len(ships)
+	s.f.state.shipCount = len(ships)
 	return nil
 }
 
@@ -155,9 +156,20 @@ func (s *Service) shot(coordinate string) (shotResult, error) {
 	if cell.ship != nil {
 		res.Knock = true
 		cell.ship.aliveCells--
+
+		if !cell.ship.isKnocked {
+			cell.ship.isKnocked = true
+			// update global state
+			s.f.state.knocked++
+		}
+
 		if cell.ship.aliveCells == 0 {
-			s.f.shipsAlive--
 			res.Destroy = true
+
+			// update global state
+			s.f.shipsAlive--
+			s.f.state.knocked--
+			s.f.state.destroyed++
 		}
 	}
 
@@ -167,5 +179,16 @@ func (s *Service) shot(coordinate string) (shotResult, error) {
 	}
 	s.f.field[c.X][c.Y] = cell
 
+	// update global state
+	s.f.state.shotCount++
 	return res, nil
+}
+
+func (s *Service) state() state {
+	s.RLock()
+	defer s.RUnlock()
+
+	s.logger.Debug("Service: state started")
+
+	return s.f.state
 }

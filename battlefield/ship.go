@@ -11,6 +11,7 @@ type ship struct {
 	inner      coordinates.Coordinates
 	outer      coordinates.Coordinates
 	aliveCells int
+	isKnocked  bool
 }
 
 func newShip(p1, p2 coordinates.Coordinate) *ship {

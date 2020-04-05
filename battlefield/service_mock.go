@@ -42,3 +42,9 @@ func (r *TestifyServiceMock) shot(coords string) (shotResult, error) {
 	results := r.Called(coords)
 	return results.Get(0).(shotResult), results.Error(1)
 }
+
+// state is mock implementation.
+func (r *TestifyServiceMock) state() state {
+	results := r.Called()
+	return results.Get(0).(state)
+}

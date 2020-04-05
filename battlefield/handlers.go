@@ -89,7 +89,7 @@ func (h Handlers) ClearBattleField(w http.ResponseWriter, _ *http.Request) {
 // @Description ships can be square or rectangular
 // @Description ships can't be placed on top of each other and near each other.
 // @Summary add ships to battlefield
-// @Success 200
+// @Success 201
 // @Failure 400 {object} battlefield.HTTPError
 // @Failure 409 {object} battlefield.HTTPError
 // @Failure 500 {string} string
@@ -118,7 +118,7 @@ func (h Handlers) AddShips(w http.ResponseWriter, r *http.Request) {
 
 // Shot handles request for make a shot
 // @Title Shot
-// @Tags BattleField
+// @Tags Battle
 // @Accept json
 // @Description make a shot to provided coordinate
 // @Description example: "A1"
@@ -157,6 +157,22 @@ func (h Handlers) Shot(w http.ResponseWriter, r *http.Request) {
 	handleOKResponse(w, resp)
 }
 
+// State handles request for state request
+// @Title State
+// @Tags BattleField
+// @Accept json
+// @Description get the state of current game
+// @Summary get the state of current game
+// @Success 200
+// @Failure 500 {string} string
+// @Router /state [get]
+func (h Handlers) State(w http.ResponseWriter, _ *http.Request) {
+	h.logger.Debug("Handlers: State started")
+
+	resp := h.e.stateEndpoint()
+	handleOKResponse(w, resp)
+}
+
 func handleErrorResponse(w http.ResponseWriter, err error) {
 	contentType, body := "text/plain; charset=utf-8", []byte(err.Error())
 	if marshaler, ok := err.(json.Marshaler); ok {
@@ -176,8 +192,6 @@ func handleErrorResponse(w http.ResponseWriter, err error) {
 func handleOKResponse(w http.ResponseWriter, resp interface{}) {
 	if sc, ok := resp.(StatusCoder); ok {
 		w.WriteHeader(sc.StatusCode())
-	} else {
-		w.WriteHeader(http.StatusOK)
 	}
 	_ = json.NewEncoder(w).Encode(resp)
 	return
