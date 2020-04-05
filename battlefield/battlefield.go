@@ -12,6 +12,8 @@ type Field struct {
 
 	gameIsOver bool
 	shipsAlive int
+
+	state state
 }
 
 type cell struct {
@@ -21,9 +23,16 @@ type cell struct {
 }
 
 type shotResult struct {
-	Destroy bool `json:"destroy"`
-	Knock   bool `json:"knock"`
-	End     bool `json:"end"`
+	Destroy bool
+	Knock   bool
+	End     bool
+}
+
+type state struct {
+	shipCount int
+	destroyed int
+	knocked   int
+	shotCount int
 }
 
 // NewField creates new battlefield with provided size.

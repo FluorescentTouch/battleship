@@ -425,3 +425,80 @@ func TestHandlers_Shot(t *testing.T) {
 		})
 	}
 }
+
+func TestHandlers_State(t *testing.T) {
+	testifyServiceMock := NewTestifyServiceMock(t)
+
+	type args struct {
+		method string
+		url    string
+	}
+
+	tests := []struct {
+		name       string
+		args       args
+		setup      func()
+		wantStatus int
+		wantBody   string
+	}{
+		{
+			name: "success",
+			args: args{
+				url:    "/state",
+				method: http.MethodGet,
+			},
+			setup: func() {
+				testifyServiceMock.On(
+					"state",
+				).Return(state{
+					knocked:   1,
+					destroyed: 1,
+					shipCount: 3,
+					shotCount: 5,
+				}).Once()
+			},
+			wantStatus: http.StatusOK,
+			wantBody:   `{"ship_count":3,"destroyed":1,"knocked":1,"shot_count":5}`,
+		},
+		{
+			name: "success, game is not started",
+			args: args{
+				url:    "/state",
+				method: http.MethodGet,
+			},
+			setup: func() {
+				testifyServiceMock.On(
+					"state",
+				).Return(state{}).Once()
+			},
+			wantStatus: http.StatusOK,
+			wantBody:   `{"ship_count":0,"destroyed":0,"knocked":0,"shot_count":0}`,
+		},
+	}
+
+	logger := logrus.New()
+	r := mux.NewRouter()
+
+	endpoints := NewEndpoints(logger, testifyServiceMock)
+	handlers := NewHandlers(logger, endpoints)
+
+	r.HandleFunc("/state", handlers.State)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup()
+			defer testifyServiceMock.AssertExpectations(t)
+
+			res := httptest.NewRecorder()
+			req, _ := http.NewRequest(
+				tt.args.method,
+				tt.args.url,
+				nil,
+			)
+			r.ServeHTTP(res, req)
+
+			assert.Equal(t, res.Code, tt.wantStatus)
+			assert.JSONEq(t, tt.wantBody, strings.TrimSpace(res.Body.String()))
+		})
+	}
+}

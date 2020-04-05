@@ -100,7 +100,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "201": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -129,7 +129,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "BattleField"
+                    "Battle"
                 ],
                 "summary": "make a shot to provided coordinate",
                 "parameters": [
@@ -151,6 +151,27 @@
                             "$ref": "#/definitions/battlefield.HTTPError"
                         }
                     },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/state": {
+            "get": {
+                "description": "get the state of current game",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BattleField"
+                ],
+                "summary": "get the state of current game",
+                "responses": {
+                    "200": {},
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {

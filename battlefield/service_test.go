@@ -563,3 +563,26 @@ func TestShot(t *testing.T) {
 		})
 	}
 }
+
+func TestState(t *testing.T) {
+	log := logrus.New()
+	want := state{
+		knocked:   1,
+		destroyed: 1,
+		shipCount: 3,
+		shotCount: 5,
+	}
+	s := &Service{
+		logger: log,
+		f: Field{
+			state: state{
+				knocked:   1,
+				destroyed: 1,
+				shipCount: 3,
+				shotCount: 5,
+			},
+		},
+	}
+	got := s.state()
+	assert.Equal(t, want, got)
+}

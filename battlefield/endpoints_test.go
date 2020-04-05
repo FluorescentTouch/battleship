@@ -239,3 +239,63 @@ func TestShotEndpoint(t *testing.T) {
 		})
 	}
 }
+
+func TestStateResponse_StatusCode(t *testing.T) {
+	want := http.StatusOK
+	got := StateResponse{}.StatusCode()
+	assert.Equal(t, want, got)
+}
+
+func TestStateEndpoint(t *testing.T) {
+	type args struct {
+		f Field
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want StateResponse
+	}{
+		{
+			name: "success",
+			args: args{f: Field{
+				state: state{
+					knocked:   1,
+					destroyed: 1,
+					shipCount: 3,
+					shotCount: 5,
+				},
+			},
+			},
+			want: StateResponse{
+				Knocked:   1,
+				Destroyed: 1,
+				ShipCount: 3,
+				ShotCount: 5,
+			},
+		},
+		{
+			name: "success, game is not started",
+			args: args{f: Field{}},
+			want: StateResponse{
+				Knocked:   0,
+				Destroyed: 0,
+				ShipCount: 0,
+				ShotCount: 0,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		l := logrus.New()
+		e := Endpoints{
+			logger:  l,
+			service: &Service{logger: l, f: tt.args.f},
+		}
+
+		t.Run(tt.name, func(t *testing.T) {
+			resp := e.stateEndpoint()
+			assert.Equal(t, tt.want, resp)
+		})
+	}
+}

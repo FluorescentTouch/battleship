@@ -41,6 +41,7 @@ func main() {
 	router.HandleFunc("/clear", bh.ClearBattleField).Methods("POST")
 	router.HandleFunc("/ship", bh.AddShips).Methods("POST")
 	router.HandleFunc("/shot", bh.Shot).Methods("POST")
+	router.HandleFunc("/state", bh.State).Methods("GET")
 
 	log.Infof("listening at :8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
