@@ -3,7 +3,7 @@
 
 # battleship
 
-Battleship is simple application, that emulates this game.
+Battleship is simple application, that emulates batlleships game.
 
 ## Toolset
 
