@@ -113,3 +113,63 @@ func TestClearFieldEndpoint(t *testing.T) {
 		})
 	}
 }
+
+func TestAddShipsResponse_StatusCode(t *testing.T) {
+	want := http.StatusCreated
+	got := AddShipsResponse{}.StatusCode()
+	assert.Equal(t, want, got)
+}
+
+func TestAddShipsEndpoint(t *testing.T) {
+	type args struct {
+		field Field
+		req   AddShipsRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    AddShipsResponse
+		wantErr error
+	}{
+		{
+			name: "success",
+			args: args{
+				field: Field{
+					field: [][]cell{{{}}},
+					size:  1,
+				},
+				req: AddShipsRequest{Coords: "A1 A1"},
+			},
+			want:    AddShipsResponse{},
+			wantErr: nil,
+		},
+		{
+			name: "error",
+			args: args{
+				field: Field{
+					shipsAdded: true,
+				},
+				req: AddShipsRequest{Coords: "A1 A1"},
+			},
+			want:    AddShipsResponse{},
+			wantErr: errorShipsAlreadyAdded,
+		},
+	}
+
+	for _, tt := range tests {
+		l := logrus.New()
+		e := Endpoints{
+			logger: l,
+			service: &Service{
+				f:      tt.args.field,
+				logger: l,
+			},
+		}
+
+		t.Run(tt.name, func(t *testing.T) {
+			resp, err := e.addShipsEndpoint(tt.args.req)
+			assert.Equal(t, tt.wantErr, err)
+			assert.Equal(t, tt.want, resp)
+		})
+	}
+}

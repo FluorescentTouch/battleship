@@ -9,6 +9,7 @@ import (
 type service interface {
 	createField(size uint) error
 	clearField() error
+	addShipsByCoordinates(coords string) error
 }
 
 // NewEndpoints creates new Endpoints.
@@ -55,4 +56,24 @@ func (e Endpoints) clearFieldEndpoint() (ClearFieldResponse, error) {
 
 	err := e.service.clearField()
 	return ClearFieldResponse{}, err
+}
+
+// AddShipsRequest collect params for addShips request.
+type AddShipsRequest struct {
+	Coords string `json:"coords"`
+}
+
+// AddShipsResponse created for swagger docs.
+type AddShipsResponse struct{}
+
+// StatusCode implements StatusCoder.
+func (r AddShipsResponse) StatusCode() int {
+	return http.StatusCreated
+}
+
+func (e Endpoints) addShipsEndpoint(req AddShipsRequest) (AddShipsResponse, error) {
+	e.logger.Debug("Endpoints: addShipsEndpoint started")
+
+	err := e.service.addShipsByCoordinates(req.Coords)
+	return AddShipsResponse{}, err
 }
