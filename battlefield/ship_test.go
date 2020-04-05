@@ -9,9 +9,19 @@ import (
 )
 
 func TestNewShip(t *testing.T) {
-	c := [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}}
-	want := &ship{c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 1, Y: 1}}}
+	c := [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 0}}
+	want := &ship{
+		c:     [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 0}},
+		inner: coordinates.Coordinates{{X: 0, Y: 0}: {}},
+		outer: coordinates.Coordinates{
+			{X: 1, Y: 0}: {},
+			{X: 0, Y: 1}: {},
+			{X: 1, Y: 1}: {},
+		},
+		aliveCells: 1,
+	}
 	got := newShip(c[0], c[1])
+
 	assert.Equal(t, want, got)
 }
 
@@ -27,18 +37,50 @@ func TestMakeShipsFromCoords(t *testing.T) {
 			args: "A1 A1",
 			want: []*ship{{
 				c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 0}},
+				inner: coordinates.Coordinates{
+					{X: 0, Y: 0}: {},
+				},
+				outer: coordinates.Coordinates{
+					{X: 1, Y: 0}: {},
+					{X: 0, Y: 1}: {},
+					{X: 1, Y: 1}: {},
+				},
+				aliveCells: 1,
 			}},
 			wantErr: nil,
 		},
 		{
 			name: "success, multiple ships",
-			args: "A1 A1,B3 C4",
+			args: "A1 A1,B3 B3",
 			want: []*ship{
 				{
 					c: [2]coordinates.Coordinate{{X: 0, Y: 0}, {X: 0, Y: 0}},
+					inner: coordinates.Coordinates{
+						{X: 0, Y: 0}: {},
+					},
+					outer: coordinates.Coordinates{
+						{X: 1, Y: 0}: {},
+						{X: 0, Y: 1}: {},
+						{X: 1, Y: 1}: {},
+					},
+					aliveCells: 1,
 				},
 				{
-					c: [2]coordinates.Coordinate{{X: 1, Y: 2}, {X: 2, Y: 3}},
+					c: [2]coordinates.Coordinate{{X: 1, Y: 2}, {X: 1, Y: 2}},
+					inner: coordinates.Coordinates{
+						{X: 1, Y: 2}: {},
+					},
+					outer: coordinates.Coordinates{
+						{X: 0, Y: 1}: {},
+						{X: 0, Y: 2}: {},
+						{X: 0, Y: 3}: {},
+						{X: 1, Y: 1}: {},
+						{X: 1, Y: 3}: {},
+						{X: 2, Y: 3}: {},
+						{X: 2, Y: 2}: {},
+						{X: 2, Y: 1}: {},
+					},
+					aliveCells: 1,
 				},
 			},
 			wantErr: nil,

@@ -53,6 +53,16 @@ func TestHTTPError_Error(t *testing.T) {
 			e:    errorOutOfBonds,
 			want: "out of bonds",
 		},
+		{
+			name: "errorCellAlreadyShot",
+			e:    errorCellAlreadyShot,
+			want: "cell was already shot",
+		},
+		{
+			name: "errorShipsNotPlaced",
+			e:    errorShipsNotPlaced,
+			want: "ships not placed yet",
+		},
 	}
 
 	for _, tt := range tests {
@@ -107,6 +117,16 @@ func TestHTTPError_StatusCode(t *testing.T) {
 		{
 			name: "errorOutOfBonds",
 			e:    errorOutOfBonds,
+			want: http.StatusBadRequest,
+		},
+		{
+			name: "errorCellAlreadyShot",
+			e:    errorCellAlreadyShot,
+			want: http.StatusBadRequest,
+		},
+		{
+			name: "errorShipsNotPlaced",
+			e:    errorShipsNotPlaced,
 			want: http.StatusBadRequest,
 		},
 	}
@@ -172,6 +192,18 @@ func TestHTTPError_MarshalJSON(t *testing.T) {
 			name:    "errorOutOfBonds",
 			e:       errorOutOfBonds,
 			want:    `{"err":"out of bonds"}`,
+			wantErr: nil,
+		},
+		{
+			name:    "errorCellAlreadyShot",
+			e:       errorCellAlreadyShot,
+			want:    `{"err":"cell was already shot"}`,
+			wantErr: nil,
+		},
+		{
+			name:    "errorShipsNotPlaced",
+			e:       errorShipsNotPlaced,
+			want:    `{"err":"ships not placed yet"}`,
 			wantErr: nil,
 		},
 	}

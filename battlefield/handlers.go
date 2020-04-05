@@ -116,6 +116,47 @@ func (h Handlers) AddShips(w http.ResponseWriter, r *http.Request) {
 	handleOKResponse(w, resp)
 }
 
+// Shot handles request for make a shot
+// @Title Shot
+// @Tags BattleField
+// @Accept json
+// @Description make a shot to provided coordinate
+// @Description example: "A1"
+// @Summary make a shot to provided coordinate
+// @Success 200
+// @Failure 400 {object} battlefield.HTTPError
+// @Failure 500 {string} string
+// @Router /shot [post]
+// @Param model body battlefield.ShotRequest true "shot coordinates"
+func (h Handlers) Shot(w http.ResponseWriter, r *http.Request) {
+	h.logger.Debug("Handlers: Shot started")
+
+	req := ShotRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		h.logger.Errorf("Handlers: Shot: can't decode request: %v", err)
+		handleErrorResponse(w, errorInvalidInputParams)
+		return
+	}
+	resp, err := h.e.shotEndpoint(req)
+	if err != nil {
+		h.logger.Errorf("Handlers: Shot: can't make a shot: %v", err)
+		handleErrorResponse(w, err)
+		return
+	}
+
+	h.logger.Infof(
+		"MADE A SHOT TO %s, HIT - %t, DESTROY - %t",
+		req.Coord,
+		resp.Knock,
+		resp.Destroy,
+	)
+	if resp.Destroy {
+		h.logger.Info("GAME OVER")
+	}
+	handleOKResponse(w, resp)
+}
+
 func handleErrorResponse(w http.ResponseWriter, err error) {
 	contentType, body := "text/plain; charset=utf-8", []byte(err.Error())
 	if marshaler, ok := err.(json.Marshaler); ok {

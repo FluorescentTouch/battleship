@@ -26,7 +26,7 @@ func (s *Service) createField(size uint) error {
 	s.Lock()
 	defer s.Unlock()
 
-	if s.f.isSet {
+	if s.f.isSet && !s.f.gameIsOver {
 		return errorFieldAlreadySet
 	}
 
@@ -55,12 +55,12 @@ func (s *Service) addShipsByCoordinates(coords string) error {
 	s.Lock()
 	defer s.Unlock()
 
+	s.logger.WithField("coords", coords).
+		Debug("Service: addShipsByCoordinates started")
+
 	if s.f.shipsAdded {
 		return errorShipsAlreadyAdded
 	}
-
-	s.logger.WithField("coords", coords).
-		Debug("Service: addShipsByCoordinates started")
 
 	ships, err := makeShipsFromCoords(coords)
 	if err != nil {
@@ -75,6 +75,7 @@ func (s *Service) addShipsByCoordinates(coords string) error {
 		return err
 	}
 	s.f.shipsAdded = true
+	s.f.shipsAlive = len(ships)
 	return nil
 }
 
@@ -89,9 +90,8 @@ func (s *Service) addShips(ships []*ship) error {
 }
 
 func (s *Service) placeShip(sh *ship) error {
-	inner, outer := coordinates.GetInnerOuterCells(sh.c)
 	// occupy ship cells
-	for _, c := range inner {
+	for c := range sh.inner {
 		if c.X >= s.f.size || c.Y >= s.f.size {
 			return errorOutOfBonds
 		}
@@ -107,7 +107,7 @@ func (s *Service) placeShip(sh *ship) error {
 		s.f.field[c.X][c.Y] = cell
 	}
 	// occupy nearby cells, skip if out of bonds
-	for _, c := range outer {
+	for c := range sh.outer {
 		if c.X >= s.f.size || c.Y >= s.f.size {
 			continue
 		}
@@ -118,5 +118,54 @@ func (s *Service) placeShip(sh *ship) error {
 		cell.occupied = true
 		s.f.field[c.X][c.Y] = cell
 	}
+
 	return nil
+}
+
+func (s *Service) shot(coordinate string) (shotResult, error) {
+	s.Lock()
+	defer s.Unlock()
+
+	s.logger.WithField("coordinate", coordinate).
+		Debug("Service: shot started")
+
+	if !s.f.shipsAdded {
+		return shotResult{}, errorShipsNotPlaced
+	}
+
+	c, ok := coordinates.ConvertCoordinate(coordinate)
+	if !ok {
+		s.logger.WithField("coordinate", coordinate).
+			Error("shot: invalid coordinate provided")
+		return shotResult{}, errorInvalidCoordinate
+	}
+
+	if c.X >= s.f.size || c.Y >= s.f.size {
+		return shotResult{}, errorOutOfBonds
+	}
+
+	cell := s.f.field[c.X][c.Y]
+	if cell.shot {
+		return shotResult{}, errorCellAlreadyShot
+	}
+	cell.shot = true
+
+	res := shotResult{}
+
+	if cell.ship != nil {
+		res.Knock = true
+		cell.ship.aliveCells--
+		if cell.ship.aliveCells == 0 {
+			s.f.shipsAlive--
+			res.Destroy = true
+		}
+	}
+
+	if s.f.shipsAlive == 0 {
+		s.f.gameIsOver = true
+		res.End = true
+	}
+	s.f.field[c.X][c.Y] = cell
+
+	return res, nil
 }

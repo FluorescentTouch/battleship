@@ -36,3 +36,9 @@ func (r *TestifyServiceMock) addShipsByCoordinates(coords string) error {
 	results := r.Called(coords)
 	return results.Error(0)
 }
+
+// addShipsByCoordinates is mock implementation.
+func (r *TestifyServiceMock) shot(coords string) (shotResult, error) {
+	results := r.Called(coords)
+	return results.Get(0).(shotResult), results.Error(1)
+}

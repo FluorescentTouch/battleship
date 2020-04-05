@@ -10,6 +10,7 @@ type service interface {
 	createField(size uint) error
 	clearField() error
 	addShipsByCoordinates(coords string) error
+	shot(coordinate string) (shotResult, error)
 }
 
 // NewEndpoints creates new Endpoints.
@@ -76,4 +77,35 @@ func (e Endpoints) addShipsEndpoint(req AddShipsRequest) (AddShipsResponse, erro
 
 	err := e.service.addShipsByCoordinates(req.Coords)
 	return AddShipsResponse{}, err
+}
+
+// ShotRequest collect params for shot request.
+type ShotRequest struct {
+	Coord string `json:"coord"`
+}
+
+// ShotResponse created contains params for shot response.
+type ShotResponse struct {
+	Destroy bool `json:"destroy"`
+	Knock   bool `json:"knock"`
+	End     bool `json:"end"`
+}
+
+// StatusCode implements StatusCoder.
+func (r ShotResponse) StatusCode() int {
+	return http.StatusOK
+}
+
+func (e Endpoints) shotEndpoint(req ShotRequest) (ShotResponse, error) {
+	e.logger.Debug("Endpoints: shotEndpoint started")
+
+	res, err := e.service.shot(req.Coord)
+	if err != nil {
+		return ShotResponse{}, err
+	}
+	return ShotResponse{
+		Destroy: res.Destroy,
+		Knock:   res.Knock,
+		End:     res.End,
+	}, nil
 }

@@ -121,6 +121,44 @@
                     }
                 }
             }
+        },
+        "/shot": {
+            "post": {
+                "description": "make a shot to provided coordinate\nexample: \"A1\"",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BattleField"
+                ],
+                "summary": "make a shot to provided coordinate",
+                "parameters": [
+                    {
+                        "description": "shot coordinates",
+                        "name": "model",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/battlefield.ShotRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {},
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/battlefield.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -144,6 +182,14 @@
             "type": "object",
             "properties": {
                 "err": {
+                    "type": "string"
+                }
+            }
+        },
+        "battlefield.ShotRequest": {
+            "type": "object",
+            "properties": {
+                "coord": {
                     "type": "string"
                 }
             }

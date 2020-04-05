@@ -317,3 +317,111 @@ func TestHandlers_AddShips(t *testing.T) {
 		})
 	}
 }
+
+func TestHandlers_Shot(t *testing.T) {
+	testifyServiceMock := NewTestifyServiceMock(t)
+
+	type args struct {
+		method string
+		url    string
+		body   string
+	}
+
+	tests := []struct {
+		name       string
+		args       args
+		setup      func()
+		wantStatus int
+		wantBody   string
+	}{
+		{
+			name: "success",
+			args: args{
+				url:    "/shot",
+				method: http.MethodPost,
+				body:   `{"coord": "A1"}`,
+			},
+			setup: func() {
+				testifyServiceMock.On(
+					"shot",
+					"A1",
+				).Return(shotResult{
+					Destroy: true,
+					Knock:   true,
+					End:     true,
+				}, nil).Once()
+			},
+			wantStatus: http.StatusOK,
+			wantBody:   `{"destroy":true,"knock":true,"end":true}`,
+		},
+		{
+			name: "error, invalid request body",
+			args: args{
+				url:    "/shot",
+				method: http.MethodPost,
+				body:   "{totally not a valid json]",
+			},
+			setup:      func() {},
+			wantStatus: http.StatusBadRequest,
+			wantBody:   `{"err":"invalid input params"}`,
+		},
+		{
+			name: "error, service error",
+			args: args{
+				url:    "/shot",
+				method: http.MethodPost,
+				body:   `{"coord": "A1"}`,
+			},
+			setup: func() {
+				testifyServiceMock.On(
+					"shot",
+					"A1",
+				).Return(shotResult{}, errorShipsNotPlaced).Once()
+			},
+			wantStatus: http.StatusBadRequest,
+			wantBody:   `{"err":"ships not placed yet"}`,
+		},
+		{
+			name: "error, service general error",
+			args: args{
+				url:    "/shot",
+				method: http.MethodPost,
+				body:   `{"coord": "A1"}`,
+			},
+			setup: func() {
+				testifyServiceMock.On(
+					"shot",
+					"A1",
+				).Return(shotResult{}, errors.New("something went wrong")).Once()
+			},
+			wantStatus: http.StatusInternalServerError,
+			wantBody:   "something went wrong",
+		},
+	}
+
+	logger := logrus.New()
+	r := mux.NewRouter()
+
+	endpoints := NewEndpoints(logger, testifyServiceMock)
+	handlers := NewHandlers(logger, endpoints)
+
+	r.HandleFunc("/shot", handlers.Shot)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup()
+			defer testifyServiceMock.AssertExpectations(t)
+
+			res := httptest.NewRecorder()
+			req, _ := http.NewRequest(
+				tt.args.method,
+				tt.args.url,
+				strings.NewReader(tt.args.body),
+			)
+			r.ServeHTTP(res, req)
+
+			assert.Equal(t, tt.wantStatus, res.Code)
+			assert.Equal(t, tt.wantBody, strings.TrimSpace(res.Body.String()))
+		})
+	}
+}
